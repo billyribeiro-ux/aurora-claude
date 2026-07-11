@@ -250,3 +250,52 @@ export async function fetchHistorical(
 		return syntheticCandles(symbol, days);
 	}
 }
+
+function daysBetween(fromISO: string, toISO: string): number {
+	const from = Date.parse(fromISO);
+	const to = Date.parse(toISO);
+	if (Number.isNaN(from) || Number.isNaN(to)) return 120;
+	return Math.max(1, Math.round((to - from) / 86_400_000));
+}
+
+/**
+ * Fetch daily candles for an explicit [from, to] date range (chronological).
+ * Additive — used only by the backtest module; the live path is untouched.
+ * Falls back to synthetic data on missing key / error.
+ */
+export async function fetchHistoricalRange(
+	symbol: string,
+	fetchFn: FetchLike,
+	from: string,
+	to: string
+): Promise<Candle[]> {
+	if (!hasApiKey()) {
+		// Deterministic synthetic bars ending at `to`, long enough to cover range.
+		return syntheticCandles(symbol, daysBetween(from, to));
+	}
+
+	try {
+		const url = `${BASE}/historical-price-eod/full?symbol=${encodeURIComponent(symbol)}&from=${from}&to=${to}&apikey=${env.FMP_API_KEY}`;
+		const res = await fetchFn(url);
+		if (!res.ok) throw new Error(`FMP historical HTTP ${res.status}`);
+		const data = (await res.json()) as FmpHistoricalBar[];
+		const rows = Array.isArray(data) ? data : [];
+		if (rows.length === 0) throw new Error('FMP historical empty');
+
+		// Newest → oldest from the API; reverse for chronological order.
+		return rows
+			.slice()
+			.reverse()
+			.map((r) => ({
+				date: r.date,
+				open: num(r.open),
+				high: num(r.high),
+				low: num(r.low),
+				close: num(r.close),
+				volume: num(r.volume)
+			}));
+	} catch (err) {
+		console.warn('[fmp] historical range fetch failed, using synthetic:', (err as Error).message);
+		return syntheticCandles(symbol, daysBetween(from, to));
+	}
+}

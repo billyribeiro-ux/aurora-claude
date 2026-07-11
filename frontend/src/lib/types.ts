@@ -165,3 +165,67 @@ export interface SystemStatus {
 	events: EventEntry[];
 	universe: string[];
 }
+
+// ---- Backtesting (additive; replays the live engine over a date range) ------
+
+export type BacktestOutcome = 'target' | 'stop' | 'timeout' | 'open';
+
+/** A signal produced on a specific historical day, with its simulated outcome. */
+export interface BacktestSignal {
+	date: string; // ISO date the signal fired
+	symbol: string;
+	direction: Direction;
+	score: number;
+	confidence: number;
+	positionSize: number;
+	stopDistance: number;
+	targetDistance: number;
+	regime: RegimeName;
+	approved: boolean;
+	price: number; // entry (close on the signal date)
+	outcome: BacktestOutcome;
+	realizedReturn: number; // direction-adjusted fraction (+ = profit)
+	exitDate: string | null;
+	holdDays: number;
+}
+
+export interface BacktestSummary {
+	from: string;
+	to: string;
+	tradingDays: number;
+	proposals: number; // directional signals evaluated
+	approved: number; // cleared the risk firewall (incl. re-signals)
+	entered: number; // actual trades taken (one per symbol until it exits)
+	closed: number; // entered trades with a realized outcome
+	wins: number;
+	losses: number;
+	winRate: number; // [0,1] over closed trades
+	avgReturn: number; // mean realized return per closed trade (fraction)
+	expectancy: number; // size-weighted mean realized return
+	totalReturn: number; // compounded size-weighted equity (fraction)
+	maxDrawdown: number; // on the equity curve (fraction, <= 0)
+	bestTrade: number;
+	worstTrade: number;
+	avgHoldDays: number;
+}
+
+export interface EquityPoint {
+	date: string;
+	equity: number; // starts at 1.0
+}
+
+export interface RegimePoint {
+	date: string;
+	regime: RegimeName;
+	confidence: number;
+}
+
+export interface BacktestResult {
+	summary: BacktestSummary;
+	signals: BacktestSignal[]; // approved directional signals (most recent first)
+	equityCurve: EquityPoint[];
+	regimeTimeline: RegimePoint[];
+	dataSource: DataSource;
+	symbolFilter: string | null;
+	truncated: boolean; // true if the signals list was capped
+}
