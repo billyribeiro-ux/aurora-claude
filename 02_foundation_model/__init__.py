@@ -17,6 +17,7 @@ from .losses import (
 )
 from .market_decoder import MarketDecoder
 from .positional_encoding import TemporalEmbedding
+from .pretraining import FoundationTrainer
 from .transformer_blocks import MarketTransformerBlock
 from .world_model import LatentDynamicsBlock, MarketWorldModel
 
@@ -32,4 +33,5 @@ __all__ = [
     "contrastive_loss",
     "latent_prediction_loss",
     "total_foundation_loss",
+    "FoundationTrainer",
 ]
