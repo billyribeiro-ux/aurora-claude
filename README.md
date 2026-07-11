@@ -1,14 +1,15 @@
 # AURORA-SWING
 
-An autonomous, adaptive quant research & trading platform. This repository
-delivers two things:
+**A**utonomous **U**nified **R**einforcement & **O**ptimization **R**esearch
+**A**rchitecture for **Swing** trading — a self-learning quantitative platform
+for 3–20 day holding periods. It does not attempt deterministic price
+prediction; it learns market-state representations, regimes, future probability
+distributions and risk-adjusted decisions.
 
-1. **Module 10 — Production Deployment Engine** (`10_deployment/`): the Python
-   inference layer that turns AURORA-SWING from a research system into an
-   operating platform.
-2. **AURORA-SWING Console** (`frontend/`): a state-of-the-art SvelteKit
-   dashboard (Svelte 5 + TypeScript strict) for monitoring the live decision
-   pipeline, signals, markets and system health.
+The repository contains the Python research modules (built out module-by-module)
+and the **AURORA-SWING Console** (`frontend/`): a state-of-the-art SvelteKit
+dashboard (Svelte 5 + TypeScript strict) for monitoring the live decision
+pipeline, signals, markets, health and architecture.
 
 ## The decision flow
 
@@ -24,18 +25,24 @@ LIVE MARKET DATA → Foundation Encoder → World Model → Regime Engine
 
 ```
 aurora-claude/
-├── 10_deployment/          # Module 10 — Python deployment engine
-│   ├── live_engine.py      #   AuroraLiveEngine — orchestrates the pipeline
-│   ├── signal_service.py   #   SignalGenerator → TradingSignal
-│   ├── monitoring.py       #   ModelMonitor — self-health & alerts
-│   ├── tests/              #   unit tests (pure-Python parts run without torch)
-│   └── requirements.txt
+├── 00_architecture/        # system_design.md — the canonical design document
+├── 01_data/                # schema, feature engineering, timeframe sync, pipeline
+├── 02_foundation_model/    # embeddings, transformer encoder, world model, losses
+├── 03_regime_engine/       # latent GMM + HMM + ensemble regime manager
+├── 10_deployment/          # AuroraLiveEngine, SignalGenerator, ModelMonitor (+ tests)
+├── requirements.txt        # Python dependencies
 └── frontend/               # AURORA-SWING Console (SvelteKit)
     └── src/
         ├── lib/server/     #   FMP client + decision engine (server-only)
-        ├── lib/components/  #   design-system components
-        └── routes/         #   Command Center, Signals, Markets, Monitoring, Protocol
+        ├── lib/components/ #   design-system components
+        └── routes/         #   Command Center, Signals, Markets,
+                            #   Monitoring, Architecture, Protocol
 ```
+
+> The Python modules (`04_environment` … `09_training`) are delivered
+> incrementally; each uses dependency injection so it integrates without hard
+> coupling. Every module follows the same production standard: typed, documented,
+> `__all__`-scoped and syntax-checked.
 
 ## Backend — Module 10
 
