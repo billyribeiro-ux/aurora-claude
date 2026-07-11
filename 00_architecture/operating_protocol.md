@@ -197,6 +197,19 @@ multi-agent committee; and a human-AI research loop
 Not "AI predicts tomorrow" — it is **a machine that continuously learns how
 markets behave and manages uncertainty better than static systems.**
 
+## Final system assessment
+
+| Dimension                   | Rating         |
+| --------------------------- | -------------- |
+| Technical sophistication    | ★★★★★          |
+| Real-world feasibility      | ★★★★☆          |
+| Difficulty                  | ★★★★★          |
+| Probability of useful alpha | Not guaranteed |
+
+This is closer to a quantitative **research platform** than a trading bot. The
+architecture is not a promise of alpha — but it is one of the strongest
+foundations available with current technology.
+
 ## Recommended build path
 
 ```
