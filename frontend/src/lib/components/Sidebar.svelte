@@ -11,6 +11,7 @@
 		{ href: '/', label: 'Command', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z' },
 		{ href: '/signals', label: 'Signals', icon: 'M3 12h4l3 8 4-16 3 8h4' },
 		{ href: '/markets', label: 'Markets', icon: 'M3 3v18h18M7 14l4-4 3 3 5-6' },
+		{ href: '/backtest', label: 'Backtest', icon: 'M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3' },
 		{ href: '/monitoring', label: 'Monitor', icon: 'M3 12h4l2-5 4 12 2-7h6' },
 		{ href: '/architecture', label: 'Arch', icon: 'M12 2 2 7l10 5 10-5zM2 12l10 5 10-5M2 17l10 5 10-5' },
 		{
