@@ -1,0 +1,6 @@
+# Module 10 — Production Deployment Engine dependencies.
+#
+# torch is required by live_engine.py (the inference pipeline).
+# signal_service.py and monitoring.py are pure-Python (stdlib only).
+torch>=2.0
+numpy>=1.24

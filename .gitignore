@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Node (the frontend also has its own .gitignore)
+node_modules/
+
+# Local env files (templates like .env.example are kept)
+.env
+
+# OS / editor / logs
+.DS_Store
+Thumbs.db
+*.log
