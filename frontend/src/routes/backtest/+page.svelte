@@ -15,19 +15,18 @@
 
 	let { data }: Props = $props();
 
-	let from = $state('');
-	let to = $state('');
+	let fromOverride = $state<string | null>(null);
+	let toOverride = $state<string | null>(null);
 	let symbol = $state('ALL');
 	let loading = $state(false);
 	let errorMsg = $state<string | null>(null);
 	let result = $state<BacktestResult | null>(null);
 
-	// Seed the inputs from server defaults once (avoids referencing props in a
-	// $state initializer).
-	$effect(() => {
-		if (!from) from = data.defaultFrom;
-		if (!to) to = data.defaultTo;
-	});
+	// Derived-fallback: render the server defaults in SSR (no post-hydration
+	// flash) while still allowing user overrides via the inputs.
+	const from = $derived(fromOverride ?? data.defaultFrom);
+	const to = $derived(toOverride ?? data.defaultTo);
+	const rangeValid = $derived(Boolean(from && to && from < to));
 
 	const tradable = [...TRADABLE];
 	const equityValues = $derived(result ? result.equityCurve.map((p) => p.equity) : []);
@@ -77,11 +76,11 @@
 		<div class="controls">
 			<label>
 				<span>From</span>
-				<input type="date" bind:value={from} max={to} />
+				<input type="date" value={from} max={to} oninput={(e) => (fromOverride = e.currentTarget.value)} />
 			</label>
 			<label>
 				<span>To</span>
-				<input type="date" bind:value={to} min={from} />
+				<input type="date" value={to} min={from} oninput={(e) => (toOverride = e.currentTarget.value)} />
 			</label>
 			<label>
 				<span>Symbol</span>
@@ -92,12 +91,12 @@
 					{/each}
 				</select>
 			</label>
-			<button class="run" type="button" onclick={run} disabled={loading}>
+			<button class="run" type="button" onclick={run} disabled={loading || !rangeValid}>
 				{loading ? 'Running…' : 'Run backtest'}
 			</button>
 		</div>
 		{#if errorMsg}
-			<div class="err">⚠ {errorMsg}</div>
+			<div class="err" role="alert"><span aria-hidden="true">⚠</span> {errorMsg}</div>
 		{/if}
 	</Card>
 
@@ -193,7 +192,9 @@
 				</div>
 			{/if}
 		</Card>
-	{:else if !loading}
+	{:else if loading}
+		<div class="empty" aria-busy="true">Running backtest…</div>
+	{:else}
 		<div class="empty">Pick a date range and run a backtest to see the signals the engine produces.</div>
 	{/if}
 </div>
