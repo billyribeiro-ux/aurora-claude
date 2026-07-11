@@ -15,7 +15,8 @@ import { env } from '$env/dynamic/private';
 import type { Candle, DataSource, Quote } from '$lib/types';
 import { UNIVERSE_META } from '$lib/universe';
 
-const BASE = 'https://financialmodelingprep.com/api/v3';
+// FMP "stable" API (the legacy /api/v3 endpoints are retired for post-2025 keys).
+const BASE = 'https://financialmodelingprep.com/stable';
 
 export type FetchLike = typeof fetch;
 
@@ -29,7 +30,7 @@ interface FmpQuote {
 	name?: string;
 	price?: number;
 	change?: number;
-	changesPercentage?: number;
+	changePercentage?: number;
 	dayLow?: number;
 	dayHigh?: number;
 	yearHigh?: number;
@@ -44,16 +45,14 @@ interface FmpQuote {
 	timestamp?: number;
 }
 
-interface FmpHistoricalResponse {
-	symbol: string;
-	historical?: Array<{
-		date: string;
-		open: number;
-		high: number;
-		low: number;
-		close: number;
-		volume: number;
-	}>;
+/** One row of the stable /historical-price-eod/full response (newest first). */
+interface FmpHistoricalBar {
+	date: string;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+	volume: number;
 }
 
 function num(value: number | undefined | null, fallback = 0): number {
@@ -123,7 +122,7 @@ function syntheticQuote(symbol: string): Quote {
 
 function toQuote(q: FmpQuote): Quote {
 	const price = num(q.price, num(q.previousClose));
-	const changePercent = num(q.changesPercentage);
+	const changePercent = num(q.changePercentage);
 	return {
 		symbol: q.symbol,
 		name: q.name ?? UNIVERSE_META[q.symbol]?.name ?? q.symbol,
@@ -159,7 +158,8 @@ export async function fetchQuotes(symbols: string[], fetchFn: FetchLike): Promis
 	}
 
 	try {
-		const url = `${BASE}/quote/${symbols.map(encodeURIComponent).join(',')}?apikey=${env.FMP_API_KEY}`;
+		const symbolParam = symbols.map(encodeURIComponent).join(',');
+		const url = `${BASE}/batch-quote?symbols=${symbolParam}&apikey=${env.FMP_API_KEY}`;
 		const res = await fetchFn(url);
 		if (!res.ok) throw new Error(`FMP quote HTTP ${res.status}`);
 		const data = (await res.json()) as FmpQuote[];
@@ -220,14 +220,20 @@ export async function fetchHistorical(
 	}
 
 	try {
-		const url = `${BASE}/historical-price-full/${encodeURIComponent(symbol)}?timeseries=${days}&apikey=${env.FMP_API_KEY}`;
+		// Bound the payload to roughly `days` trading rows via a `from` date
+		// (1.6× calendar days covers weekends/holidays).
+		const from = new Date(Date.now() - Math.ceil(days * 1.6) * 86_400_000)
+			.toISOString()
+			.slice(0, 10);
+		const url = `${BASE}/historical-price-eod/full?symbol=${encodeURIComponent(symbol)}&from=${from}&apikey=${env.FMP_API_KEY}`;
 		const res = await fetchFn(url);
 		if (!res.ok) throw new Error(`FMP historical HTTP ${res.status}`);
-		const data = (await res.json()) as FmpHistoricalResponse;
-		const rows = data.historical ?? [];
+		const data = (await res.json()) as FmpHistoricalBar[];
+		const rows = Array.isArray(data) ? data : [];
 		if (rows.length === 0) throw new Error('FMP historical empty');
 
-		// FMP returns newest → oldest; reverse for chronological order.
+		// Stable API returns newest → oldest; take the most recent `days` and
+		// reverse for chronological order.
 		return rows
 			.slice(0, days)
 			.reverse()
