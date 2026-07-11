@@ -17,11 +17,16 @@ export const GET: RequestHandler = async ({ url, fetch, setHeaders }) => {
 	if (!DATE_RE.test(from) || !DATE_RE.test(to)) {
 		error(400, 'from and to must be YYYY-MM-DD dates');
 	}
+	const fromMs = Date.parse(from);
+	const toMs = Date.parse(to);
+	if (Number.isNaN(fromMs) || Number.isNaN(toMs)) {
+		error(400, 'from and to must be valid calendar dates');
+	}
 	if (from >= to) {
 		error(400, 'from must be before to');
 	}
-	const span = (Date.parse(to) - Date.parse(from)) / 86_400_000;
-	if (span > MAX_SPAN_DAYS) {
+	const span = (toMs - fromMs) / 86_400_000;
+	if (!Number.isFinite(span) || span > MAX_SPAN_DAYS) {
 		error(400, `date range too large (max ${MAX_SPAN_DAYS} days ≈ 2 years)`);
 	}
 

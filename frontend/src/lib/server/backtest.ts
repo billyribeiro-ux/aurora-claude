@@ -139,7 +139,7 @@ function simulateOutcome(
 	}
 
 	const exitBar = candles[lastIdx];
-	const raw = (exitBar.close - entry) / entry;
+	const raw = entry > 0 ? (exitBar.close - entry) / entry : 0;
 	return {
 		outcome: 'timeout',
 		realizedReturn: long ? raw : -raw,
