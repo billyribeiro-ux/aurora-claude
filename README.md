@@ -25,24 +25,29 @@ LIVE MARKET DATA → Foundation Encoder → World Model → Regime Engine
 
 ```
 aurora-claude/
-├── 00_architecture/        # system_design.md — the canonical design document
-├── 01_data/                # schema, feature engineering, timeframe sync, pipeline
-├── 02_foundation_model/    # embeddings, transformer encoder, world model, losses
-├── 03_regime_engine/       # latent GMM + HMM + ensemble regime manager
-├── 10_deployment/          # AuroraLiveEngine, SignalGenerator, ModelMonitor (+ tests)
-├── requirements.txt        # Python dependencies
-└── frontend/               # AURORA-SWING Console (SvelteKit)
+├── 00_architecture/            # system_design.md — the canonical design document
+├── 01_data/                    # schema, feature engineering, timeframe sync, pipeline
+├── 02_foundation_model/        # embeddings, transformer encoder, world model, losses, pretraining
+├── 03_regime_engine/           # latent GMM + HMM + ensemble regime manager
+├── 04_environment/             # transaction costs, portfolio, execution sim, Gym env
+├── 05_risk_engine/             # volatility model, position sizing, gap risk, risk firewall
+├── 06_reinforcement_learning/  # actor/critic, PPO, SAC, prioritized replay, reward
+├── 07_continual_learning/      # experience DB, drift detection, EWC, model-update gate
+├── 08_backtesting/             # walk-forward, Monte Carlo, evaluation metrics
+├── 09_training/                # foundation / world-model / RL trainers + master pipeline
+├── 10_deployment/              # AuroraLiveEngine, SignalGenerator, ModelMonitor (+ tests)
+├── requirements.txt            # Python dependencies
+└── frontend/                   # AURORA-SWING Console (SvelteKit)
     └── src/
-        ├── lib/server/     #   FMP client + decision engine (server-only)
-        ├── lib/components/ #   design-system components
-        └── routes/         #   Command Center, Signals, Markets,
-                            #   Monitoring, Architecture, Protocol
+        ├── lib/server/         #   FMP client + decision engine (server-only)
+        ├── lib/components/     #   design-system components
+        └── routes/             #   Command Center, Signals, Markets,
+                                #   Monitoring, Architecture, Protocol
 ```
 
-> The Python modules (`04_environment` … `09_training`) are delivered
-> incrementally; each uses dependency injection so it integrates without hard
-> coupling. Every module follows the same production standard: typed, documented,
-> `__all__`-scoped and syntax-checked.
+> All ten modules are implemented and use dependency injection so they integrate
+> without hard coupling. Every module follows the same production standard:
+> typed, documented, `__all__`-scoped and syntax-checked.
 
 ## Backend — Module 10
 
