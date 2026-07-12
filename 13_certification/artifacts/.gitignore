@@ -1,3 +1,7 @@
-# Keep the certification evidence tracked; ignore nothing else here for now.
+# Raw fetched constituent snapshots — reproducible from FMP, not committed.
+sp500/
+# Keep the certification evidence tracked.
 !certification.json
 !CERTIFICATION.md
+!certification_pit.json
+!CERTIFICATION_PIT.md

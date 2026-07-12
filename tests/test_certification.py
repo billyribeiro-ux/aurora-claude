@@ -25,6 +25,7 @@ import l6_significance as l6  # noqa: E402
 from l1_data_integrity import run_level1  # noqa: E402
 from panel import Panel  # noqa: E402
 from strategy import build_long_short  # noqa: E402
+from sp500_pit import reconstruct_from_events  # noqa: E402
 
 
 def test_max_drawdown_known() -> None:
@@ -121,6 +122,28 @@ def test_level1_flags_survivorship() -> None:
     assert surv is False and curr["passed"] is False
     surv2 = {c["check"]: c["passed"] for c in hist["checks"]}["survivorship_bias_controlled"]
     assert surv2 is True
+
+
+def test_pit_reconstruction_point_in_time() -> None:
+    """Backward replay must place removed names in the past and adds after their date."""
+    # Today's members: SURV (always there) and NEW (added 2022). GONE was removed 2022.
+    current = {"SURV", "NEW"}
+    events = [{"date": "2022-06-01", "added": "NEW", "removed": "GONE"}]
+    tl = reconstruct_from_events(current, events)
+
+    # NEW is a member only from 2022-06-01 onward.
+    assert tl.is_member("NEW", "2022-07-01") is True
+    assert tl.is_member("NEW", "2021-01-01") is False
+    # GONE was a member before 2022-06-01 and not after — the survivorship name.
+    assert tl.is_member("GONE", "2020-01-01") is True
+    assert tl.is_member("GONE", "2023-01-01") is False
+    # SURV is a member throughout.
+    assert tl.is_member("SURV", "2016-01-01") is True
+    # GONE is in the ever-member pool but not current → the survivorship gap.
+    ever = tl.ever_members("2015-01-01", "2026-01-01")
+    assert "GONE" in ever and "GONE" not in tl.current
+    assert tl.members_on("2020-01-01") == {"SURV", "GONE"}
+    assert tl.members_on("2023-01-01") == {"SURV", "NEW"}
 
 
 def test_bootstrap_ci_structure() -> None:
