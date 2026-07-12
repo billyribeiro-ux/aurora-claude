@@ -25,7 +25,7 @@
 	});
 </script>
 
-<Card eyebrow="Self-Monitoring" title="System Health">
+<Card eyebrow="Self-Monitoring · illustrative" title="System Health">
 	{#snippet action()}
 		<Badge variant={statusVariant} dot pulse={health.status !== 'HEALTHY'}>{health.status}</Badge>
 	{/snippet}

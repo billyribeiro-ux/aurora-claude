@@ -10,6 +10,7 @@
 	import HealthPanel from '$lib/components/HealthPanel.svelte';
 	import SignalsTable from '$lib/components/SignalsTable.svelte';
 	import EventLog from '$lib/components/EventLog.svelte';
+	import Disclosure from '$lib/components/Disclosure.svelte';
 
 	interface Props {
 		data: PageServerData;
@@ -59,6 +60,8 @@
 </script>
 
 <div class="page">
+	<Disclosure kind="signals" />
+
 	<div class="controls">
 		<button class="live" type="button" class:on={live} onclick={() => (live = !live)}>
 			<span class="dot"></span>
@@ -99,7 +102,7 @@
 		<StatTile label="Max Drawdown" value={pct(portfolio.maxDrawdownPct)} sub="limit 15.0%" tone="down" />
 	</div>
 
-	<Card eyebrow="Inference Pipeline" title="Decision Flow" tight>
+	<Card eyebrow="Reference Pipeline (target design)" title="Decision Flow" tight>
 		<div class="pipeline-pad">
 			<PipelineFlow stages={status.pipeline} />
 		</div>
@@ -111,7 +114,7 @@
 	</div>
 
 	<div class="cols signals">
-		<Card eyebrow="RL Policy → Risk Firewall" title="Live Signals">
+		<Card eyebrow="Heuristic Engine → Risk Firewall" title="Live Signals">
 			{#snippet action()}
 				<span class="count mono">{approved} approved</span>
 			{/snippet}

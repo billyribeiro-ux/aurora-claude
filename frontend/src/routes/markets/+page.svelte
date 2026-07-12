@@ -49,10 +49,10 @@
 			<PriceChart {candles} symbol={selected} name={selectedName} {loading} />
 			<Card eyebrow="Context" title="Why it matters">
 				<p class="note">
-					The foundation encoder consumes this same price action across the full universe — market
-					ETFs, macro instruments and sectors — to build the latent state that drives regime
-					detection and the RL policy. Selecting a symbol here previews the raw series feeding that
-					pipeline.
+					The live engine reads this same price action across the full universe — market ETFs, macro
+					instruments and sectors — to detect the regime and score signals. In the target design, a
+					foundation encoder consumes it to build a latent market state; that trained stack is not
+					yet live. Selecting a symbol previews the raw series feeding the engine.
 				</p>
 			</Card>
 		</div>

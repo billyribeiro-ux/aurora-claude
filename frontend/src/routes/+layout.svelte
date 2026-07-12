@@ -6,6 +6,7 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import DataModeBanner from '$lib/components/DataModeBanner.svelte';
+	import SiteFooter from '$lib/components/SiteFooter.svelte';
 
 	interface Props {
 		data: LayoutServerData;
@@ -28,6 +29,7 @@
 		<main class="content">
 			{@render children()}
 		</main>
+		<SiteFooter />
 	</div>
 </div>
 

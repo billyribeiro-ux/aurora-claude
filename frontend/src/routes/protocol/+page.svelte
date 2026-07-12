@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import Badge from '$lib/components/Badge.svelte';
+	import Disclosure from '$lib/components/Disclosure.svelte';
 
 	const phases = [
 		{ n: 0, title: 'Data Acquisition', body: '10+ years of daily / 4H / 1H OHLCV. Start with the S&P 500, expand to the Russell 3000. Add market (SPY, QQQ, IWM), macro (VIX, TNX, DXY, gold, oil) and sector ETF context.' },
@@ -49,6 +50,8 @@
 </script>
 
 <div class="page">
+	<Disclosure kind="design" />
+
 	<Card eyebrow="Positioning" title="What this system actually is">
 		<p class="lede">
 			AURORA-SWING is not a prediction machine. It is an adaptive, probabilistic decision system that

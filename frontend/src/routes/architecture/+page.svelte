@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import Badge from '$lib/components/Badge.svelte';
+	import Disclosure from '$lib/components/Disclosure.svelte';
 
 	const flow = [
 		{ tag: 'Perceive', label: 'Foundation Encoder', desc: 'Hierarchical transformer → latent state z(t)' },
@@ -97,6 +98,8 @@
 </script>
 
 <div class="page">
+	<Disclosure kind="design" />
+
 	<Card eyebrow="AURORA-SWING" title="Autonomous market intelligence, not price prediction">
 		<p class="lede">
 			A self-learning platform for <strong>3–20 day</strong> swing horizons. It does not attempt

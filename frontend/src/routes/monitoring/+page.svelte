@@ -4,6 +4,7 @@
 	import HealthPanel from '$lib/components/HealthPanel.svelte';
 	import PipelineFlow from '$lib/components/PipelineFlow.svelte';
 	import EventLog from '$lib/components/EventLog.svelte';
+	import Disclosure from '$lib/components/Disclosure.svelte';
 
 	interface Props {
 		data: PageServerData;
@@ -28,6 +29,8 @@
 </script>
 
 <div class="page">
+	<Disclosure kind="design" />
+
 	<div class="cols">
 		<HealthPanel health={status.health} />
 

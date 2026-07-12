@@ -4,6 +4,7 @@
 	import Card from '$lib/components/Card.svelte';
 	import StatTile from '$lib/components/StatTile.svelte';
 	import SignalsTable from '$lib/components/SignalsTable.svelte';
+	import Disclosure from '$lib/components/Disclosure.svelte';
 
 	interface Props {
 		data: PageServerData;
@@ -20,7 +21,7 @@
 	const deployed = $derived(approved.reduce((a, s) => a + s.positionSize, 0));
 
 	const firewallRules = [
-		'Reject any proposal whose calibrated confidence sits below the 48% floor.',
+		'Reject any proposal whose heuristic confidence score sits below the 48% floor.',
 		'Stand aside when annualized volatility exceeds the 95% ceiling.',
 		'Block all new entries in a CRISIS regime; suppress new longs in a BEAR trend.',
 		'Trim or reject positions that would breach the 10% portfolio-heat budget.',
@@ -29,8 +30,10 @@
 </script>
 
 <div class="page">
+	<Disclosure kind="signals" />
+
 	<div class="kpis">
-		<StatTile label="Proposals" value={String(signals.length)} sub="from RL policy" />
+		<StatTile label="Proposals" value={String(signals.length)} sub="from heuristic engine" />
 		<StatTile label="Approved" value={String(approved.length)} sub="cleared firewall" tone="up" />
 		<StatTile
 			label="Blocked"
@@ -51,8 +54,9 @@
 
 	<Card eyebrow="How decisions clear" title="Risk Firewall Policy">
 		<p class="lede">
-			The neural pipeline never trades directly. Every RL proposal must pass an independent risk
-			firewall before it becomes an approved signal:
+			The engine never trades directly. Every proposal from the rule-based engine must pass an
+			independent risk firewall before it becomes an approved signal — the same firewall a trained
+			policy would have to clear once one earns its place:
 		</p>
 		<ul class="rules">
 			{#each firewallRules as rule, i (i)}
