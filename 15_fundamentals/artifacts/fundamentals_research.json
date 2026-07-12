@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "oos_window": [
+      "2023-01-03",
+      "2026-06-25"
+    ],
+    "symbols_used": 685,
+    "with_fundamentals": 667,
+    "delisted_included": 185,
+    "samples": 1354941,
+    "n_tech": 24,
+    "n_fund": 11,
+    "fundamental_lag_days": 90,
+    "runtime_seconds": 127.1,
+    "seed": 7
+  },
+  "oos_ic": {
+    "technicals_only": 0.005056045763747636,
+    "technicals_plus_fundamentals": 0.0014747329926231342
+  },
+  "incremental_ic_from_fundamentals": -0.0035813127711245016,
+  "strategy": {
+    "n_days": 872,
+    "total_return": -0.08277,
+    "cagr": -0.024659,
+    "ann_vol": 0.042461,
+    "sharpe": -0.566777,
+    "sortino": -0.756169,
+    "calmar": -0.247471,
+    "max_drawdown": -0.099643
+  },
+  "baselines": {
+    "buy_and_hold_spy": {
+      "n_days": 872,
+      "total_return": 0.92009,
+      "cagr": 0.207473,
+      "ann_vol": 0.152077,
+      "sharpe": 1.315737,
+      "sortino": 1.79128,
+      "calmar": 1.092025,
+      "max_drawdown": -0.189989
+    },
+    "momentum_20d": {
+      "n_days": 872,
+      "total_return": 0.095532,
+      "cagr": 0.026718,
+      "ann_vol": 0.044096,
+      "sharpe": 0.619997,
+      "sortino": 0.468612,
+      "calmar": 0.3949,
+      "max_drawdown": -0.067658
+    },
+    "ma_cross_50_200": {
+      "n_days": 872,
+      "total_return": 0.537835,
+      "cagr": 0.13244,
+      "ann_vol": 0.144087,
+      "sharpe": 0.934997,
+      "sortino": 1.199028,
+      "calmar": 0.697092,
+      "max_drawdown": -0.189989
+    },
+    "random_agent": {
+      "n_days": 872,
+      "total_return": 0.176119,
+      "cagr": 0.047996,
+      "ann_vol": 0.152555,
+      "sharpe": 0.382927,
+      "sortino": 0.574448,
+      "calmar": 0.228184,
+      "max_drawdown": -0.210341
+    }
+  },
+  "trade_stats": {
+    "trades": 180495,
+    "win_rate": 0.5009889470622455,
+    "avg_win": 0.04740664007896746,
+    "avg_loss": -0.04952649359677056,
+    "profit_factor": 0.9635269040865688,
+    "expectancy": -0.0008990339732645309,
+    "max_losing_streak": 16,
+    "avg_holding_days": null
+  },
+  "gates": {
+    "L3": false,
+    "L4": true,
+    "L5": false,
+    "L6": false
+  },
+  "significance": {
+    "bootstrap_ci": {
+      "n_boot": 10000,
+      "ann_return_mean": -0.0225,
+      "ann_return_ci95": [
+        -0.0646,
+        0.0207
+      ],
+      "sharpe_mean": -0.522,
+      "sharpe_ci95": [
+        -1.552,
+        0.512
+      ],
+      "prob_sharpe_positive": 0.1611
+    },
+    "pbo": {
+      "pbo": 0.1706,
+      "n_configs": 6,
+      "n_splits": 252,
+      "S": 10,
+      "interpretation": "low overfitting risk"
+    }
+  },
+  "regime_caveat": "OOS 2023-2026 was a mega-cap growth regime historically hostile to value/quality factors; a weak result is regime-conditional."
+}

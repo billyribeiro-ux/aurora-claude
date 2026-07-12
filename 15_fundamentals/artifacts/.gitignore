@@ -1,0 +1,5 @@
+# raw fetched fundamentals — reproducible from FMP, not committed
+keymetrics/
+# keep research evidence
+!fundamentals_research.json
+!FUNDAMENTALS_RESEARCH.md
