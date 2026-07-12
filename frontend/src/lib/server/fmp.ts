@@ -59,6 +59,33 @@ function num(value: number | undefined | null, fallback = 0): number {
 	return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
+// ---- Lightweight server-side cache -----------------------------------------
+// Cuts FMP calls (rate-limit resilience + speed): quotes refresh often, EOD
+// history is stable intraday. Only *successful real* fetches are cached — a
+// transient failure's synthetic fallback is never cached, so it retries.
+interface CacheEntry<T> {
+	at: number;
+	value: T;
+}
+const QUOTE_TTL_MS = 20_000;
+const HIST_TTL_MS = 30 * 60_000;
+const quoteCache = new Map<string, CacheEntry<QuoteResult>>();
+const histCache = new Map<string, CacheEntry<HistoryResult>>();
+
+function cacheGet<T>(cache: Map<string, CacheEntry<T>>, key: string, ttl: number): T | null {
+	const hit = cache.get(key);
+	if (!hit) return null;
+	if (Date.now() - hit.at > ttl) {
+		cache.delete(key);
+		return null;
+	}
+	return hit.value;
+}
+
+function cacheSet<T>(cache: Map<string, CacheEntry<T>>, key: string, value: T): void {
+	cache.set(key, { at: Date.now(), value });
+}
+
 /**
  * Deterministic pseudo-random in [0,1) seeded by a string. Used only for the
  * synthetic fallback so the demo is stable across reloads (no Math.random).
@@ -149,12 +176,28 @@ export interface QuoteResult {
 	source: DataSource;
 }
 
+export interface HistoryResult {
+	candles: Candle[];
+	/**
+	 * What actually produced the candles — 'FMP' only if the live fetch
+	 * succeeded. A transient failure (e.g. rate limit) yields synthetic candles
+	 * labelled 'SYNTHETIC', so callers never mistake a fallback for live data.
+	 */
+	source: DataSource;
+}
+
 /** Fetch batched quotes for `symbols`. Falls back to synthetic data on error. */
 export async function fetchQuotes(symbols: string[], fetchFn: FetchLike): Promise<QuoteResult> {
 	if (symbols.length === 0) return { quotes: [], source: hasApiKey() ? 'FMP' : 'SYNTHETIC' };
 
+	const cacheKey = symbols.join(',');
+	const cached = cacheGet(quoteCache, cacheKey, QUOTE_TTL_MS);
+	if (cached) return cached;
+
 	if (!hasApiKey()) {
-		return { quotes: symbols.map(syntheticQuote), source: 'SYNTHETIC' };
+		const result: QuoteResult = { quotes: symbols.map(syntheticQuote), source: 'SYNTHETIC' };
+		cacheSet(quoteCache, cacheKey, result);
+		return result;
 	}
 
 	try {
@@ -167,10 +210,15 @@ export async function fetchQuotes(symbols: string[], fetchFn: FetchLike): Promis
 
 		const bySymbol = new Map(data.map((q) => [q.symbol, toQuote(q)]));
 		// Preserve requested order; synthesize any the provider omitted.
-		return { quotes: symbols.map((s) => bySymbol.get(s) ?? syntheticQuote(s)), source: 'FMP' };
+		const result: QuoteResult = {
+			quotes: symbols.map((s) => bySymbol.get(s) ?? syntheticQuote(s)),
+			source: 'FMP'
+		};
+		cacheSet(quoteCache, cacheKey, result);
+		return result;
 	} catch (err) {
 		console.warn('[fmp] quote fetch failed, using synthetic data:', (err as Error).message);
-		return { quotes: symbols.map(syntheticQuote), source: 'SYNTHETIC' };
+		return { quotes: symbols.map(syntheticQuote), source: 'SYNTHETIC' }; // not cached
 	}
 }
 
@@ -214,9 +262,15 @@ export async function fetchHistorical(
 	symbol: string,
 	fetchFn: FetchLike,
 	days = 120
-): Promise<Candle[]> {
+): Promise<HistoryResult> {
+	const cacheKey = `daily:${symbol}:${days}`;
+	const cached = cacheGet(histCache, cacheKey, HIST_TTL_MS);
+	if (cached) return cached;
+
 	if (!hasApiKey()) {
-		return syntheticCandles(symbol, days);
+		const result: HistoryResult = { candles: syntheticCandles(symbol, days), source: 'SYNTHETIC' };
+		cacheSet(histCache, cacheKey, result);
+		return result;
 	}
 
 	try {
@@ -234,7 +288,7 @@ export async function fetchHistorical(
 
 		// Stable API returns newest → oldest; take the most recent `days` and
 		// reverse for chronological order.
-		return rows
+		const candles = rows
 			.slice(0, days)
 			.reverse()
 			.map((r) => ({
@@ -245,9 +299,12 @@ export async function fetchHistorical(
 				close: num(r.close),
 				volume: num(r.volume)
 			}));
+		const result: HistoryResult = { candles, source: 'FMP' };
+		cacheSet(histCache, cacheKey, result);
+		return result;
 	} catch (err) {
 		console.warn('[fmp] historical fetch failed, using synthetic data:', (err as Error).message);
-		return syntheticCandles(symbol, days);
+		return { candles: syntheticCandles(symbol, days), source: 'SYNTHETIC' }; // not cached
 	}
 }
 
@@ -268,10 +325,19 @@ export async function fetchHistoricalRange(
 	fetchFn: FetchLike,
 	from: string,
 	to: string
-): Promise<Candle[]> {
+): Promise<HistoryResult> {
+	const cacheKey = `range:${symbol}:${from}:${to}`;
+	const cached = cacheGet(histCache, cacheKey, HIST_TTL_MS);
+	if (cached) return cached;
+
 	if (!hasApiKey()) {
 		// Deterministic synthetic bars ending at `to`, long enough to cover range.
-		return syntheticCandles(symbol, daysBetween(from, to));
+		const result: HistoryResult = {
+			candles: syntheticCandles(symbol, daysBetween(from, to)),
+			source: 'SYNTHETIC'
+		};
+		cacheSet(histCache, cacheKey, result);
+		return result;
 	}
 
 	try {
@@ -283,7 +349,7 @@ export async function fetchHistoricalRange(
 		if (rows.length === 0) throw new Error('FMP historical empty');
 
 		// Newest → oldest from the API; reverse for chronological order.
-		return rows
+		const candles = rows
 			.slice()
 			.reverse()
 			.map((r) => ({
@@ -294,8 +360,14 @@ export async function fetchHistoricalRange(
 				close: num(r.close),
 				volume: num(r.volume)
 			}));
+		const result: HistoryResult = { candles, source: 'FMP' };
+		cacheSet(histCache, cacheKey, result);
+		return result;
 	} catch (err) {
 		console.warn('[fmp] historical range fetch failed, using synthetic:', (err as Error).message);
-		return syntheticCandles(symbol, daysBetween(from, to));
+		return {
+			candles: syntheticCandles(symbol, daysBetween(from, to)),
+			source: 'SYNTHETIC'
+		}; // not cached
 	}
 }

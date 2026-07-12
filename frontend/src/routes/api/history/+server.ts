@@ -10,7 +10,7 @@ export const GET: RequestHandler = async ({ url, fetch, setHeaders }) => {
 
 	const days = Math.min(Math.max(Number(url.searchParams.get('days') ?? '120') || 120, 20), 400);
 
-	const candles = await fetchHistorical(symbol, fetch, days);
+	const { candles, source } = await fetchHistorical(symbol, fetch, days);
 	setHeaders({ 'cache-control': 'no-store' });
-	return json({ symbol, name: UNIVERSE_META[symbol]?.name ?? symbol, candles });
+	return json({ symbol, name: UNIVERSE_META[symbol]?.name ?? symbol, candles, source });
 };

@@ -6,7 +6,7 @@ import { nameOf } from '$lib/universe';
 export const load: PageServerLoad = async ({ fetch }) => {
 	const snapshot = await buildSnapshot(fetch);
 	const initialSymbol = 'SPY';
-	const initialCandles = await fetchHistorical(initialSymbol, fetch, 120);
+	const { candles: initialCandles } = await fetchHistorical(initialSymbol, fetch, 120);
 	return {
 		snapshot,
 		initialSymbol,

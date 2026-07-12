@@ -24,3 +24,15 @@ def load_module(rel_path: str, name: str) -> ModuleType:
     sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
+
+
+def load_package(name: str) -> ModuleType:
+    """Import a digit-prefixed package (e.g. ``11_research_agents``) as a whole.
+
+    ``import 11_research_agents`` is a syntax error, but ``import_module`` takes
+    the name as a string and resolves the package's intra-package relative
+    imports correctly.
+    """
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+    return importlib.import_module(name)

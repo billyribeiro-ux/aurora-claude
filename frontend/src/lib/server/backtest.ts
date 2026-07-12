@@ -166,9 +166,15 @@ export async function runBacktest(
 
 	const series = new Map<string, Candle[]>();
 	const byDate = new Map<string, Map<string, number>>();
+	// Track whether EVERY symbol's candles came from live FMP. If any symbol
+	// fell back to synthetic (e.g. a transient rate limit), the run is not
+	// wholly live and must not be labelled 'FMP' — otherwise a consumer would
+	// trust range-dependent synthetic bars as real market data.
+	let allLive = true;
 	await Promise.all(
 		BACKTEST_UNIVERSE.map(async (s) => {
-			const candles = await fetchHistoricalRange(s, fetchFn, fetchFrom, fetchTo);
+			const { candles, source } = await fetchHistoricalRange(s, fetchFn, fetchFrom, fetchTo);
+			if (source !== 'FMP') allLive = false;
 			series.set(s, candles);
 			byDate.set(s, new Map(candles.map((c, i) => [c.date, i])));
 		})
@@ -298,7 +304,8 @@ export async function runBacktest(
 		signals: signals.slice(0, SIGNAL_CAP),
 		equityCurve,
 		regimeTimeline,
-		dataSource: hasApiKey() ? 'FMP' : 'SYNTHETIC',
+		// 'FMP' only when a key is set AND every symbol resolved to live data.
+		dataSource: hasApiKey() && allLive ? 'FMP' : 'SYNTHETIC',
 		symbolFilter,
 		truncated: signals.length > SIGNAL_CAP
 	};
