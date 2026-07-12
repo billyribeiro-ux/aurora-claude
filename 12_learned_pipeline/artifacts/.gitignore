@@ -1,0 +1,5 @@
+# Raw market-data cache — reproducible from FMP, not committed.
+data/
+# Keep the evidence artifacts (results.json, REPORT.md) tracked.
+!results.json
+!REPORT.md

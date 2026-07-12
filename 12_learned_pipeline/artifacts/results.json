@@ -1,0 +1,149 @@
+{
+  "dataset": {
+    "samples": 89792,
+    "train": 61568,
+    "test": 27904,
+    "features": [
+      "log_return",
+      "atr_pct",
+      "rsi",
+      "volatility",
+      "volume_zscore",
+      "trend_strength",
+      "high_low_range",
+      "close_position"
+    ],
+    "seq_len": 32,
+    "abs_pos_rate_test": 0.5552608944954128,
+    "xs_pos_rate_test": 0.47451978211009177,
+    "train_start": "2015-04-29",
+    "train_end": "2022-12-15",
+    "test_start": "2023-01-03"
+  },
+  "encoder": {
+    "config": {
+      "d_model": 64,
+      "n_heads": 4,
+      "n_layers": 2,
+      "ff": 128,
+      "dropout": 0.1,
+      "mask_ratio": 0.15,
+      "epochs": 20,
+      "batch_size": 256,
+      "lr": 0.001,
+      "val_frac": 0.1,
+      "seed": 7
+    },
+    "final_train_loss": 0.5438202148483645,
+    "final_val_loss": 0.5232888460159302,
+    "representation_dim": 64
+  },
+  "cross_sectional_task": {
+    "metrics_oos": {
+      "hand_logistic": {
+        "accuracy": 0.5286338876146789,
+        "roc_auc": 0.5149267110943241,
+        "ic": 0.02445436458644134
+      },
+      "hand_gbm": {
+        "accuracy": 0.5142990252293578,
+        "roc_auc": 0.5078829181655355,
+        "ic": 0.00935953549597289
+      },
+      "ssl_probe": {
+        "accuracy": 0.5182411123853211,
+        "roc_auc": 0.500972306433537,
+        "ic": -0.006617446608038632
+      },
+      "majority_null": {
+        "accuracy": 0.5254802178899083,
+        "roc_auc": NaN,
+        "ic": 0.0
+      }
+    },
+    "best_by_ic": "hand_logistic",
+    "significance": {
+      "real_ic": 0.02445436458644134,
+      "null_ic_mean": 0.0005878857670987619,
+      "null_ic_std": 0.021067020601798787,
+      "null_ic_p95_abs": 0.03876618683459677,
+      "p_value": 0.16666666666666666,
+      "significant": false,
+      "n_perm": 12
+    },
+    "quantile_analysis": {
+      "bucket_mean_fwd": [
+        -0.002736897815969401,
+        -0.0025772154137248186,
+        -0.002215700974706595,
+        0.00048045496814555716,
+        0.007050622562283259
+      ],
+      "bucket_hit_rate": [
+        0.4624619243863107,
+        0.45959505464970435,
+        0.4735710446156603,
+        0.4773338111449561,
+        0.4996415770609319
+      ],
+      "long_short_spread": 0.00978752037825266,
+      "monotone_increasing": true,
+      "n_buckets": 5
+    }
+  },
+  "absolute_task": {
+    "metrics_oos": {
+      "hand_logistic": {
+        "accuracy": 0.553504873853211,
+        "roc_auc": 0.4996841776084049,
+        "ic": 0.0013207281877419268
+      },
+      "hand_gbm": {
+        "accuracy": 0.5479142775229358,
+        "roc_auc": 0.5035418638828453,
+        "ic": -0.010477087768067165
+      },
+      "ssl_probe": {
+        "accuracy": 0.5368047591743119,
+        "roc_auc": 0.511778152380891,
+        "ic": 0.0047572932141655665
+      },
+      "majority_null": {
+        "accuracy": 0.5552608944954128,
+        "roc_auc": NaN,
+        "ic": 0.0
+      }
+    },
+    "best_by_ic": "hand_gbm",
+    "significance": {
+      "real_ic": -0.010477087768067165,
+      "null_ic_mean": -0.00789091528875042,
+      "null_ic_std": 0.015397159797997296,
+      "null_ic_p95_abs": 0.032030129677837735,
+      "p_value": 0.3333333333333333,
+      "significant": false,
+      "n_perm": 12
+    },
+    "quantile_analysis": {
+      "bucket_mean_fwd": [
+        0.013441255222046408,
+        0.008102260435526526,
+        0.006477002233386737,
+        0.006771365060244662,
+        0.010584891930183173
+      ],
+      "bucket_hit_rate": [
+        0.5615481096577675,
+        0.5524099623723348,
+        0.539867407274682,
+        0.5497222719942663,
+        0.5727598566308244
+      ],
+      "long_short_spread": -0.0028563632918632356,
+      "monotone_increasing": false,
+      "n_buckets": 5
+    }
+  },
+  "runtime_seconds": 590.1,
+  "seed": 7
+}
