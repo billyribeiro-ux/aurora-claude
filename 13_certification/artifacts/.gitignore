@@ -1,0 +1,3 @@
+# Keep the certification evidence tracked; ignore nothing else here for now.
+!certification.json
+!CERTIFICATION.md
