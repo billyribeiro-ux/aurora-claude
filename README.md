@@ -11,6 +11,13 @@ and the **AURORA-SWING Console** (`frontend/`): a state-of-the-art SvelteKit
 dashboard (Svelte 5 + TypeScript strict) for monitoring the live decision
 pipeline, signals, markets, health and architecture.
 
+> **Read [`RESULTS.md`](RESULTS.md) first.** It is the honest evidence ledger.
+> AURORA is a **research platform** and makes **no claim of a profitable edge** —
+> in fact it *proves*, survivorship-free, that the current signal has none. The
+> value is the rigor: survivorship-free point-in-time testing, PBO, embargoed
+> walk-forward, leakage-controlled data, and results reported as-measured. See
+> also [`00_architecture/north_star.md`](00_architecture/north_star.md).
+
 ## The decision flow
 
 The live system **never** trades directly from the neural-network output.
@@ -36,6 +43,13 @@ aurora-claude/
 ├── 08_backtesting/             # walk-forward, Monte Carlo, evaluation metrics
 ├── 09_training/                # foundation / world-model / RL trainers + master pipeline
 ├── 10_deployment/              # AuroraLiveEngine, SignalGenerator, ModelMonitor (+ tests)
+├── 11_research_agents/         # multi-agent research committee scaffold
+├── 12_learned_pipeline/        # trained self-supervised encoder + honest OOS harness
+├── 13_certification/           # institutional L1–L6 gauntlet incl. survivorship-free PIT
+├── 14_alpha_research/          # rich features + cross-sectional rank-normalization
+├── 15_fundamentals/            # leakage-safe point-in-time fundamental factors
+├── tests/                      # pytest suite (47 tests)
+├── RESULTS.md                  # ← the honest evidence ledger
 ├── requirements.txt            # Python dependencies
 └── frontend/                   # AURORA-SWING Console (SvelteKit)
     └── src/
@@ -45,9 +59,11 @@ aurora-claude/
                                 #   Monitoring, Architecture, Protocol
 ```
 
-> All ten modules are implemented and use dependency injection so they integrate
-> without hard coupling. Every module follows the same production standard:
-> typed, documented, `__all__`-scoped and syntax-checked.
+> Modules 00–15 are implemented. The architecture modules (01–09) use dependency
+> injection so they integrate without hard coupling; 10 deploys; 12–15 are the
+> **evidence layer** — actually-trained models and the certification harness that
+> holds every claim to survivorship-free, out-of-sample, PBO-checked proof. Every
+> module is typed, documented, `__all__`-scoped and tested.
 
 ## Backend — Module 10
 

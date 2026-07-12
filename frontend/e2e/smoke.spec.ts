@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const routes = ['/', '/signals', '/markets', '/backtest', '/monitoring', '/architecture', '/protocol'];
+const routes = ['/', '/signals', '/markets', '/backtest', '/monitoring', '/architecture', '/protocol', '/research'];
 
 for (const path of routes) {
 	test(`page loads: ${path}`, async ({ page }) => {

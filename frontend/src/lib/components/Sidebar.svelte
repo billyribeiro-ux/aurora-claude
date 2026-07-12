@@ -18,6 +18,11 @@
 			href: '/protocol',
 			label: 'Protocol',
 			icon: 'M5 4a2 2 0 0 1 2-2h12v18H7a2 2 0 0 0-2 2zM19 2v18'
+		},
+		{
+			href: '/research',
+			label: 'Research',
+			icon: 'M9 3v6l-5 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-5-9V3M8 3h8M8 13h8'
 		}
 	];
 
