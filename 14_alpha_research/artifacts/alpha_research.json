@@ -1,0 +1,226 @@
+{
+  "meta": {
+    "mode": "rich features + cross-sectional rank-norm, survivorship-free",
+    "oos_window": [
+      "2023-01-03",
+      "2026-06-25"
+    ],
+    "symbols_used": 685,
+    "delisted_included": 185,
+    "samples": 1354941,
+    "features": 24,
+    "runtime_seconds": 120.4,
+    "seed": 7
+  },
+  "oos_ic": {
+    "gbm": 0.005056045763747636,
+    "logistic": 0.010306556556497136,
+    "ensemble": 0.008724760009287869
+  },
+  "strategy": {
+    "n_days": 872,
+    "total_return": -0.023683,
+    "cagr": -0.006903,
+    "ann_vol": 0.038345,
+    "sharpe": -0.161481,
+    "sortino": -0.221824,
+    "calmar": -0.081738,
+    "max_drawdown": -0.084448
+  },
+  "baselines": {
+    "buy_and_hold_spy": {
+      "n_days": 872,
+      "total_return": 0.92009,
+      "cagr": 0.207473,
+      "ann_vol": 0.152077,
+      "sharpe": 1.315737,
+      "sortino": 1.79128,
+      "calmar": 1.092025,
+      "max_drawdown": -0.189989
+    },
+    "momentum_20d": {
+      "n_days": 872,
+      "total_return": 0.095532,
+      "cagr": 0.026718,
+      "ann_vol": 0.044096,
+      "sharpe": 0.619997,
+      "sortino": 0.468612,
+      "calmar": 0.3949,
+      "max_drawdown": -0.067658
+    },
+    "ma_cross_50_200": {
+      "n_days": 872,
+      "total_return": 0.537835,
+      "cagr": 0.13244,
+      "ann_vol": 0.144087,
+      "sharpe": 0.934997,
+      "sortino": 1.199028,
+      "calmar": 0.697092,
+      "max_drawdown": -0.189989
+    },
+    "random_agent": {
+      "n_days": 872,
+      "total_return": 0.176119,
+      "cagr": 0.047996,
+      "ann_vol": 0.152555,
+      "sharpe": 0.382927,
+      "sortino": 0.574448,
+      "calmar": 0.228184,
+      "max_drawdown": -0.210341
+    }
+  },
+  "trade_stats": {
+    "trades": 180496,
+    "win_rate": 0.5055790710043436,
+    "avg_win": 0.047717363802290434,
+    "avg_loss": -0.049444903468613806,
+    "profit_factor": 0.9894909186847874,
+    "expectancy": -0.00025622321123765473,
+    "max_losing_streak": 17,
+    "avg_holding_days": null
+  },
+  "regime": {
+    "level": 4,
+    "name": "Regime-Specific Validation",
+    "regime_breakdown": {
+      "high_volatility": {
+        "days": 98,
+        "total_return": 0.0175,
+        "sharpe": 0.949,
+        "max_drawdown": -0.0156,
+        "ann_vol": 0.0482
+      },
+      "bear": {
+        "days": 29,
+        "total_return": -0.0001,
+        "sharpe": -0.013,
+        "max_drawdown": -0.0119,
+        "ann_vol": 0.0329
+      },
+      "sideways": {
+        "days": 38,
+        "total_return": -0.0257,
+        "sharpe": -3.765,
+        "max_drawdown": -0.0278,
+        "ann_vol": 0.0457
+      },
+      "bull": {
+        "days": 707,
+        "total_return": -0.015,
+        "sharpe": -0.129,
+        "max_drawdown": -0.0652,
+        "ann_vol": 0.0365
+      }
+    },
+    "worst_regime_drawdown": -0.0652,
+    "passed": true
+  },
+  "monte_carlo": {
+    "level": 5,
+    "name": "Monte Carlo Stress Testing",
+    "tests": [
+      {
+        "test": "trade_order_randomization",
+        "simulations": 10000,
+        "actual_max_drawdown": -0.0844,
+        "p05_max_drawdown": -0.1175,
+        "median_max_drawdown": -0.0823,
+        "p95_max_drawdown": -0.0571
+      },
+      {
+        "test": "slippage_stress",
+        "base_cost_bps": 5.0,
+        "by_multiple": {
+          "1x": {
+            "cagr": -0.0222,
+            "sharpe": -0.566
+          },
+          "2x": {
+            "cagr": -0.0373,
+            "sharpe": -0.971
+          },
+          "5x": {
+            "cagr": -0.0811,
+            "sharpe": -2.184
+          },
+          "10x": {
+            "cagr": -0.1498,
+            "sharpe": -4.196
+          }
+        },
+        "profitable_up_to_multiple": null
+      },
+      {
+        "test": "gap_stress",
+        "base_sharpe": -0.161,
+        "stressed_sharpe_median": 0.045,
+        "stressed_sharpe_p05": -0.912
+      },
+      {
+        "test": "missing_data",
+        "base_sharpe": -0.161,
+        "median_sharpe_by_drop": {
+          "5pct": -0.161,
+          "10pct": -0.116,
+          "20pct": -0.11
+        }
+      }
+    ],
+    "passed": false
+  },
+  "significance": {
+    "level": 6,
+    "name": "Statistical Significance Testing",
+    "bootstrap_ci": {
+      "n_boot": 10000,
+      "ann_return_mean": -0.0067,
+      "ann_return_ci95": [
+        -0.0437,
+        0.0309
+      ],
+      "sharpe_mean": -0.164,
+      "sharpe_ci95": [
+        -1.161,
+        0.809
+      ],
+      "prob_sharpe_positive": 0.3774
+    },
+    "pbo_cscv": {
+      "pbo": 0.4484,
+      "n_configs": 9,
+      "n_splits": 252,
+      "S": 10,
+      "interpretation": "moderate"
+    },
+    "config_names": [
+      "gbm_q10",
+      "gbm_q20",
+      "gbm_q30",
+      "logistic_q10",
+      "logistic_q20",
+      "logistic_q30",
+      "ensemble_q10",
+      "ensemble_q20",
+      "ensemble_q30"
+    ],
+    "passed": false
+  },
+  "gates": {
+    "L3": false,
+    "L4": true,
+    "L5": false,
+    "L6": false
+  },
+  "vs_naive_features_pit": {
+    "naive": {
+      "sharpe": -0.8833972395365481,
+      "cagr": -0.06360659888527087,
+      "max_drawdown": -0.2262525385841736
+    },
+    "rich": {
+      "sharpe": -0.16148144844582765,
+      "cagr": -0.006902618293754603,
+      "max_drawdown": -0.0844482448731616
+    }
+  }
+}
