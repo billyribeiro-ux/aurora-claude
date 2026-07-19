@@ -1,6 +1,6 @@
 # AURORA-SWING — Survivorship-Free Certification (Point-in-Time S&P 500)
 
-*OOS **2023-01-03 → 2026-06-25** · 698 symbols used, of which **197 were later removed / acquired / delisted** and are tradable only while they were actual index members · 1,455,682 samples · seed 7 · runtime 100.0s.*
+*OOS **2023-01-03 → 2026-06-25** · 698 symbols used, of which **197 were later removed / acquired / delisted** and are tradable only while they were actual index members · 1,455,682 samples · seed 7 · runtime 103.9s.*
 
 This repeats the certification gauntlet on the **true, then-available universe** — the single most important fix, because it de-biases every downstream number. Level 2 (representation quality) is universe-agnostic and already certified in Module 12.
 
@@ -71,6 +71,7 @@ _The gap between these columns is survivorship bias — the free lunch of only t
 
 - Bootstrap Sharpe -0.84 (95% CI [-1.784, 0.097]), P(Sharpe>0)=0.0405.
 - **PBO (CSCV)**: 0.4524 → moderate.
+- **Deflated Sharpe Ratio**: 0.0295 (significant: False).
 - Verdict: ❌ FAIL
 
 ## Honest verdict

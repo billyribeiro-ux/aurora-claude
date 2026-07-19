@@ -11,7 +11,8 @@
 		{ name: 'Survivorship-free (point-in-time)', detail: 'includes 197 removed / delisted names', sharpe: '−0.88', tone: 'down' as const, note: 'the bias was the edge' },
 		{ name: '+ rich features, rank-normalized', detail: '24 leakage-safe factors', sharpe: '−0.16', tone: 'down' as const, note: 'method helped; still no edge' },
 		{ name: '+ leakage-safe fundamentals', detail: 'point-in-time value/quality', sharpe: '−0.57', tone: 'down' as const, note: 'hurt in this regime' },
-		{ name: 'Baseline: buy-and-hold SPY', detail: 'the bar none of the above beat', sharpe: '+1.32', tone: 'up' as const, note: 'reference' }
+		{ name: 'End-to-end deep decoder', detail: 'unsupervised pretrain + fine-tune, IC +0.0127, maxDD −6.2%', sharpe: '+0.76', tone: 'up' as const, note: 'best honest signal — still not certified' },
+		{ name: 'Baseline: buy-and-hold SPY', detail: 'the bar still unbeaten', sharpe: '+1.32', tone: 'up' as const, note: 'reference' }
 	];
 
 	const proven = [
@@ -24,8 +25,11 @@
 	const methodology = [
 		['Survivorship-free', 'Point-in-time S&P 500 membership including the companies that died.'],
 		['PBO (CSCV)', 'Bailey & López de Prado — measures backtest-overfitting probability directly.'],
-		['Embargoed walk-forward', 'No training label may touch the test period.'],
+		['Deflated Sharpe Ratio', 'Corrects for selection across every configuration tried plus skew/kurtosis; DSR > 0.95 required to pass.'],
+		['8-year walk-forward', 'Sequential one-year OOS folds (2019–2026) — no single lucky split; IC positive 6/8 years, failing exactly in the 2020/2022 crisis regimes.'],
+		['Embargoed labels', 'No training label may touch the test period.'],
 		['Leakage-safe fundamentals', 'Data usable only after its filing date (+90-day conservative lag).'],
+		['24/7 continual loop', 'Nightly refresh → re-certify → commit-only-if-changed, with honest failure semantics.'],
 		['Reported as-measured', 'The console labels what is heuristic, trained, or without demonstrated edge.']
 	];
 </script>
@@ -49,14 +53,15 @@
 		</div>
 	</Card>
 
-	<Card eyebrow="The headline finding" title="Survivorship bias manufactured the entire apparent edge">
+	<Card eyebrow="The headline findings" title="Bias made the fake edge; the deep model is the first honest one — still uncertified">
 		{#snippet action()}
-			<Badge variant="warn" dot>NO EDGE DEMONSTRATED</Badge>
+			<Badge variant="warn" dot>NO CERTIFIED EDGE</Badge>
 		{/snippet}
 		<p class="lede">
-			The same cross-sectional strategy, measured four ways over an identical out-of-sample window
-			(2023–2026). Once the companies that were removed, acquired or went bankrupt are included —
-			and traded only while they were real index members — the apparent edge disappears.
+			The same task, attacked five ways over an identical out-of-sample window (2023–2026),
+			survivorship-free. Hand-built signals collapse once the dead companies are included. The
+			end-to-end deep model — pretrained <strong>unsupervised</strong>, fine-tuned on the decision —
+			is the first genuinely positive result, and the gates still correctly refuse to certify it.
 		</p>
 		<div class="table-wrap">
 			<table>

@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "folds": 8,
+    "samples": 1354941,
+    "symbols": 685,
+    "delisted_included": 185,
+    "horizon": 10,
+    "seed": 7,
+    "runtime_seconds": 148.4
+  },
+  "folds": [
+    {
+      "year": 2019,
+      "train_samples": 369981,
+      "test_samples": 129362,
+      "oos_ic": 0.0114,
+      "strategy_sharpe": 0.241,
+      "strategy_return": 0.0065,
+      "strategy_maxdd": -0.0369,
+      "spy_sharpe": 2.079
+    },
+    {
+      "year": 2020,
+      "train_samples": 499290,
+      "test_samples": 130870,
+      "oos_ic": -0.0187,
+      "strategy_sharpe": -0.304,
+      "strategy_return": -0.0269,
+      "strategy_maxdd": -0.0873,
+      "spy_sharpe": 0.614
+    },
+    {
+      "year": 2021,
+      "train_samples": 630147,
+      "test_samples": 130979,
+      "oos_ic": 0.0426,
+      "strategy_sharpe": 2.009,
+      "strategy_return": 0.0653,
+      "strategy_maxdd": -0.0161,
+      "spy_sharpe": 1.892
+    },
+    {
+      "year": 2022,
+      "train_samples": 761099,
+      "test_samples": 130449,
+      "oos_ic": -0.0157,
+      "strategy_sharpe": -1.203,
+      "strategy_return": -0.0406,
+      "strategy_maxdd": -0.0452,
+      "spy_sharpe": -0.775
+    },
+    {
+      "year": 2023,
+      "train_samples": 892061,
+      "test_samples": 130403,
+      "oos_ic": 0.0043,
+      "strategy_sharpe": -0.687,
+      "strategy_return": -0.0205,
+      "strategy_maxdd": -0.0315,
+      "spy_sharpe": 1.728
+    },
+    {
+      "year": 2024,
+      "train_samples": 1022444,
+      "test_samples": 132416,
+      "oos_ic": 0.0025,
+      "strategy_sharpe": 0.744,
+      "strategy_return": 0.0172,
+      "strategy_maxdd": -0.0208,
+      "spy_sharpe": 1.728
+    },
+    {
+      "year": 2025,
+      "train_samples": 1154285,
+      "test_samples": 132315,
+      "oos_ic": 0.0363,
+      "strategy_sharpe": 1.19,
+      "strategy_return": 0.0507,
+      "strategy_maxdd": -0.0259,
+      "spy_sharpe": 0.88
+    },
+    {
+      "year": 2026,
+      "train_samples": 1286615,
+      "test_samples": 63059,
+      "oos_ic": 0.0188,
+      "strategy_sharpe": 1.253,
+      "strategy_return": 0.0237,
+      "strategy_maxdd": -0.0246,
+      "spy_sharpe": 1.169
+    }
+  ],
+  "summary": {
+    "mean_oos_ic": 0.0102,
+    "ic_positive_years": 6,
+    "mean_strategy_sharpe": 0.405,
+    "sharpe_positive_years": 5,
+    "worst_year_sharpe": -1.203
+  }
+}

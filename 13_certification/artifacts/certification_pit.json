@@ -8,7 +8,7 @@
     "symbols_used": 698,
     "delisted_or_removed_included": 197,
     "samples": 1455682,
-    "runtime_seconds": 100.0,
+    "runtime_seconds": 103.9,
     "seed": 7
   },
   "dataset": {
@@ -248,6 +248,15 @@
         "n_splits": 252,
         "S": 10,
         "interpretation": "moderate"
+      },
+      "deflated_sharpe": {
+        "observed_sharpe_ann": -0.883,
+        "expected_max_null_sharpe_ann": 0.151,
+        "n_trials": 9,
+        "skew": 0.543,
+        "kurtosis": 9.475,
+        "dsr": 0.0295,
+        "significant": false
       },
       "config_names": [
         "logistic_q10_h5",
