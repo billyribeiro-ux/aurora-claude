@@ -80,7 +80,9 @@ def build_sequences(timeline):
             used.add(sym)
             if sym not in timeline.current:
                 deaths.add(sym)
-    X = np.concatenate(Xs).astype(np.float32)
+    X = np.concatenate(Xs)  # inputs are float32 → result is float32 (no extra copy)
+    assert X.dtype == np.float32
+    Xs.clear()  # release the per-symbol copies before building the rest
     fwd = np.concatenate(fwds)
     dates = np.concatenate(ds)
     syms = np.concatenate(sy)
@@ -125,12 +127,10 @@ def main():
     F = d["X"].shape[2]
     print(f"      n={d['n']:,} train={tr.sum():,} test={te.sum():,} symbols={d['used']} deaths={d['deaths']}")
 
-    print("[2/6] scaling (train stats) ...")
-    mu = d["X"][tr].reshape(-1, F).mean(0)
-    sd = d["X"][tr].reshape(-1, F).std(0) + 1e-8
-    Xs = (d["X"] - mu) / sd
+    print("[2/6] scaling (train stats, in-place chunked — memory-safe) ...")
+    X = d.pop("X")  # single 4.1GB owner; everything below views/copies slices of it
 
-    # subsample train for CPU tractability (seeded, honest)
+    # Seeded train subsample for CPU tractability (reported honestly in meta).
     tr_idx = np.where(tr)[0]
     rng = np.random.default_rng(SEED)
     if len(tr_idx) > MAX_TRAIN:
@@ -139,19 +139,34 @@ def main():
     perm = rng.permutation(len(tr_idx))
     va_sel, tr_sel = tr_idx[perm[:n_val]], tr_idx[perm[n_val:]]
 
+    # Scaler stats from a ≤100k training subsample (train-only, no test peeking),
+    # then standardize the full array IN PLACE in chunks — peak stays ~1 copy.
+    stat_sel = tr_sel[:: max(1, len(tr_sel) // 100_000)]
+    sample = X[stat_sel]
+    mu = sample.reshape(-1, F).mean(0).astype(np.float32)
+    sd = (sample.reshape(-1, F).std(0) + 1e-8).astype(np.float32)
+    del sample
+    CHUNK = 100_000
+    for s in range(0, len(X), CHUNK):
+        X[s : s + CHUNK] = (X[s : s + CHUNK] - mu) / sd
+
     print(f"[3/6] self-supervised pretraining ({pre_ep} ep) on {len(tr_sel):,} seqs ...")
     ssl_cfg = enc_mod.EncoderConfig(epochs=pre_ep, seed=SEED)
-    ssl, _ = enc_mod.pretrain_encoder(Xs[tr_sel], ssl_cfg)
+    ssl, _ = enc_mod.pretrain_encoder(X[tr_sel], ssl_cfg)
 
     print(f"[4/6] fine-tuning end-to-end ({ft_ep} ep): pretrained vs scratch ...")
     cfg = dm.DeepConfig(epochs=ft_ep, seed=SEED)
+    Xtr_s, Xva_s = X[tr_sel], X[va_sel]  # materialize once, reuse for both models
     m_pre = dm.DeepDecoder(F, L, cfg); m_pre.load_pretrained(ssl)
-    dm.train_supervised(m_pre, Xs[tr_sel], d["y"][tr_sel], Xs[va_sel], d["y"][va_sel], cfg)
+    dm.train_supervised(m_pre, Xtr_s, d["y"][tr_sel], Xva_s, d["y"][va_sel], cfg)
     m_scr = dm.DeepDecoder(F, L, cfg)
-    dm.train_supervised(m_scr, Xs[tr_sel], d["y"][tr_sel], Xs[va_sel], d["y"][va_sel], cfg)
+    dm.train_supervised(m_scr, Xtr_s, d["y"][tr_sel], Xva_s, d["y"][va_sel], cfg)
+    del Xtr_s, Xva_s
 
-    p_pre = dm.predict_proba(m_pre, Xs[te])
-    p_scr = dm.predict_proba(m_scr, Xs[te])
+    X_te = X[te]
+    p_pre = dm.predict_proba(m_pre, X_te)
+    p_scr = dm.predict_proba(m_scr, X_te)
+    del X_te, X
     ic = {"deep_pretrained_finetuned": _ic(p_pre, d["fwd_xs"][te]),
           "deep_from_scratch": _ic(p_scr, d["fwd_xs"][te])}
     print(f"      OOS IC: {ic}")

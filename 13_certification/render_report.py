@@ -91,6 +91,8 @@ def render_certification_pit(r: dict) -> str:
         f"- Bootstrap Sharpe {ci.get('sharpe_mean', 0):+.2f} (95% CI {ci.get('sharpe_ci95')}), "
         f"P(Sharpe>0)={ci.get('prob_sharpe_positive')}.",
         f"- **PBO (CSCV)**: {pbo.get('pbo')} → {pbo.get('interpretation')}.",
+        (f"- **Deflated Sharpe Ratio**: {L[6].get('deflated_sharpe', {}).get('dsr', 'n/a')} "
+         f"(significant: {L[6].get('deflated_sharpe', {}).get('significant', 'n/a')})."),
         f"- Verdict: {_gate(L[6]['passed'])}",
         "", "## Honest verdict", "",
         f"With survivorship bias removed, the strategy's Sharpe moved from "
@@ -197,6 +199,7 @@ def render_certification(r: dict) -> str:
     # L6
     ci = L[6]["bootstrap_ci"]
     pbo = L[6]["pbo_cscv"]
+    dsr = L[6].get("deflated_sharpe", {})
     out += [
         "## Level 6 — Statistical Significance",
         "",
@@ -206,8 +209,13 @@ def render_certification(r: dict) -> str:
         f"P(Sharpe>0) = {ci.get('prob_sharpe_positive')}.",
         f"- **PBO (CSCV)** across {pbo.get('n_configs')} configs, {pbo.get('n_splits')} splits: "
         f"**{pbo.get('pbo')}** → {pbo.get('interpretation')}.",
+        (f"- **Deflated Sharpe Ratio** (selection across {dsr.get('n_trials')} trials + "
+         f"skew {dsr.get('skew')} / kurtosis {dsr.get('kurtosis')}): observed "
+         f"{dsr.get('observed_sharpe_ann')} vs null-max {dsr.get('expected_max_null_sharpe_ann')} "
+         f"→ **DSR {dsr.get('dsr')}** (significant: {dsr.get('significant')})."
+         if dsr and "dsr" in dsr else "- Deflated Sharpe: n/a."),
         f"- Verdict: {_gate(L[6]['passed'])} "
-        "(requires Sharpe CI lower bound > 0 AND PBO < 0.5).",
+        "(requires Sharpe CI lower bound > 0 AND PBO < 0.5 AND DSR > 0.95).",
         "",
         "## Honest verdict",
         "",

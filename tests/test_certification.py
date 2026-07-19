@@ -152,3 +152,31 @@ def test_bootstrap_ci_structure() -> None:
     ci = l6.block_bootstrap_ci(r, n_boot=200, block=10, seed=1)
     assert ci["sharpe_ci95"][0] <= ci["sharpe_mean"] <= ci["sharpe_ci95"][1]
     assert 0.0 <= ci["prob_sharpe_positive"] <= 1.0
+
+
+def test_dsr_confirms_genuine_edge() -> None:
+    """A strong, real strategy tested once (no selection) → DSR near 1."""
+    rng = np.random.default_rng(7)
+    r = rng.normal(0.0012, 0.008, 1500)  # ann. Sharpe ≈ 2.4, genuinely strong
+    out = l6.deflated_sharpe_ratio(r, np.array([r.mean() / r.std(ddof=1)]))
+    assert out["dsr"] > 0.95 and out["significant"] is True
+    assert out["expected_max_null_sharpe_ann"] == 0.0  # N=1 → reduces to PSR
+
+
+def test_dsr_kills_best_of_many_noise() -> None:
+    """Selecting the best of 200 pure-noise strategies must NOT be significant —
+    this is exactly the self-deception DSR exists to catch."""
+    rng = np.random.default_rng(8)
+    M = rng.normal(0.0, 0.01, size=(1500, 200))          # 200 zero-skill trials
+    trial_srs = M.mean(0) / M.std(0, ddof=1)
+    best = int(np.argmax(trial_srs))
+    out = l6.deflated_sharpe_ratio(M[:, best], trial_srs)  # cherry-picked winner
+    assert out["significant"] is False
+    assert out["dsr"] < 0.95
+    # And the null-max expectation is meaningfully positive (selection penalty).
+    assert out["expected_max_null_sharpe_ann"] > 0.5
+
+
+def test_dsr_degenerate_inputs() -> None:
+    out = l6.deflated_sharpe_ratio(np.full(100, 0.001), np.array([0.1]))
+    assert "error" in out  # zero-variance series is rejected, not mis-scored
