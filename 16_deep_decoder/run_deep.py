@@ -150,17 +150,44 @@ def main():
     for s in range(0, len(X), CHUNK):
         X[s : s + CHUNK] = (X[s : s + CHUNK] - mu) / sd
 
+    # Stage-level checkpoints: the dataset build is fully deterministic (seeded),
+    # so weights saved after each expensive stage are valid across container
+    # restarts — a restart resumes instead of starting over.
+    import torch
+    ckpt = ARTIFACTS / "ckpt"
+    ckpt.mkdir(parents=True, exist_ok=True)
+
     print(f"[3/6] self-supervised pretraining ({pre_ep} ep) on {len(tr_sel):,} seqs ...")
     ssl_cfg = enc_mod.EncoderConfig(epochs=pre_ep, seed=SEED)
-    ssl, _ = enc_mod.pretrain_encoder(X[tr_sel], ssl_cfg)
+    ssl_path = ckpt / f"ssl_pre{pre_ep}.pt"
+    if ssl_path.exists():
+        ssl = enc_mod.MaskedSeqAutoencoder(F, L, ssl_cfg)
+        ssl.load_state_dict(torch.load(ssl_path, weights_only=True))
+        print("      [ckpt] loaded pretrained encoder — skipping pretraining")
+    else:
+        ssl, _ = enc_mod.pretrain_encoder(X[tr_sel], ssl_cfg)
+        torch.save(ssl.state_dict(), ssl_path)
 
     print(f"[4/6] fine-tuning end-to-end ({ft_ep} ep): pretrained vs scratch ...")
     cfg = dm.DeepConfig(epochs=ft_ep, seed=SEED)
     Xtr_s, Xva_s = X[tr_sel], X[va_sel]  # materialize once, reuse for both models
-    m_pre = dm.DeepDecoder(F, L, cfg); m_pre.load_pretrained(ssl)
-    dm.train_supervised(m_pre, Xtr_s, d["y"][tr_sel], Xva_s, d["y"][va_sel], cfg)
+    m_pre = dm.DeepDecoder(F, L, cfg)
+    pre_path = ckpt / f"deep_pre{pre_ep}_ft{ft_ep}.pt"
+    if pre_path.exists():
+        m_pre.load_state_dict(torch.load(pre_path, weights_only=True))
+        print("      [ckpt] loaded fine-tuned (pretrained) model")
+    else:
+        m_pre.load_pretrained(ssl)
+        dm.train_supervised(m_pre, Xtr_s, d["y"][tr_sel], Xva_s, d["y"][va_sel], cfg)
+        torch.save(m_pre.state_dict(), pre_path)
     m_scr = dm.DeepDecoder(F, L, cfg)
-    dm.train_supervised(m_scr, Xtr_s, d["y"][tr_sel], Xva_s, d["y"][va_sel], cfg)
+    scr_path = ckpt / f"deep_scratch_ft{ft_ep}.pt"
+    if scr_path.exists():
+        m_scr.load_state_dict(torch.load(scr_path, weights_only=True))
+        print("      [ckpt] loaded fine-tuned (scratch) model")
+    else:
+        dm.train_supervised(m_scr, Xtr_s, d["y"][tr_sel], Xva_s, d["y"][va_sel], cfg)
+        torch.save(m_scr.state_dict(), scr_path)
     del Xtr_s, Xva_s
 
     X_te = X[te]
