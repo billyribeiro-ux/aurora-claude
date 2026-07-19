@@ -110,8 +110,9 @@ def _ic(s, f):
     return float(ic) if np.isfinite(ic) else 0.0
 
 
-def _panel(proba, dates, syms, mask):
-    df = pd.DataFrame({"date": pd.to_datetime(dates[mask]), "sym": syms[mask], "score": proba[mask]})
+def _panel(proba_te, dates, syms, mask):
+    """proba_te is already test-only (len == mask.sum()); dates/syms are full-length."""
+    df = pd.DataFrame({"date": pd.to_datetime(dates[mask]), "sym": syms[mask], "score": proba_te})
     return df.pivot_table(index="date", columns="sym", values="score", aggfunc="mean")
 
 
