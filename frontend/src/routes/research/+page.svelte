@@ -18,7 +18,7 @@
 		{ label: 'Live data vs raw source', value: '120/120', sub: 'exact OHLC match' },
 		{ label: 'No look-ahead leakage', value: 'verified', sub: 'feature + label embargo' },
 		{ label: 'Encoder vs random', value: '+64%', sub: 'masked reconstruction' },
-		{ label: 'Test coverage', value: '47 + 12', sub: 'python + e2e, passing' }
+		{ label: 'Test coverage', value: '50 + 13', sub: 'python + e2e, passing' }
 	];
 
 	const methodology = [
